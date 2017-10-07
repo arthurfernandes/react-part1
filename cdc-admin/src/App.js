@@ -3,7 +3,57 @@ import './App.css';
 import './css/pure-min.css';
 import './css/side-menu.css';
 
+import HttpService from './services/HttpService';
+
+import InputCustomizado from './components/InputCustomizado';
+import BotaoSubmitCustomizado from './components/BotaoSubmitCustomizado';
+
 class App extends Component {
+  constructor(){
+    super();
+    this.state = {nome: '', email: '', senha: '', lista: []};
+    this._httpService = new HttpService();
+
+    this.enviaForm = this.enviaForm.bind(this);
+    this.setNome = this.setNome.bind(this);
+    this.setEmail = this.setEmail.bind(this);
+    this.setSenha = this.setSenha.bind(this);
+  }
+
+  componentDidMount() {
+    this._httpService.get('http://localhost:8080/api/autores')
+      .then(autores => {
+        this.setState({lista: autores});
+      })
+      .catch( err => {
+        console.log(err);
+      });
+  }
+
+  setNome(event) {
+    this.setState({nome : event.target.value});
+  }
+
+  setEmail(event) {
+    this.setState({email : event.target.value});
+  }
+
+  setSenha(event) {
+    this.setState({senha : event.target.value});
+  }
+
+  enviaForm(event) {
+    event.preventDefault();
+
+    this._httpService.post('http://localhost:8080/api/autores', {
+      nome : this.state.nome,
+      email : this.state.email,
+      senha: this.state.senha})
+    .then(res => res.json())
+    .then(lista => this.setState({lista : lista}))
+    .catch( err => console.log(err));
+  }
+
   render() {
     return (
   <div id="layout">
@@ -32,23 +82,12 @@ class App extends Component {
 
       <div className="content" id="content">
         <div className="pure-form pure-form-aligned">
-          <form className="pure-form pure-form-aligned">
-            <div className="pure-control-group">
-              <label htmlFor="nome">Nome</label> 
-              <input id="nome" type="text" name="nome" value=""  />                  
-            </div>
-            <div className="pure-control-group">
-              <label htmlFor="email">Email</label> 
-              <input id="email" type="email" name="email" value=""  />                  
-            </div>
-            <div className="pure-control-group">
-              <label htmlFor="senha">Senha</label> 
-              <input id="senha" type="password" name="senha"  />                                      
-            </div>
-            <div className="pure-control-group">                                  
-              <label></label> 
-              <button type="submit" className="pure-button pure-button-primary">Gravar</button>                                    
-            </div>
+          <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm}>
+            <InputCustomizado id="nome" type="text" name="nome" label="Nome" value={this.state.nome} onChange={this.setNome}/>
+            <InputCustomizado id="email" type="email" name="email" label="Email" value={this.state.email} onChange={this.setEmail}/>
+            <InputCustomizado id="senha" type="password" name="senha" label="Senha" value={this.state.senha} onChange={this.setSenha}/>
+
+            <BotaoSubmitCustomizado label="Gravar"/>
           </form>             
 
         </div>
@@ -61,10 +100,15 @@ class App extends Component {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Alberto</td>                
-                <td>alberto.souza@caelum.com.br</td>                
-              </tr>
+              {
+                this.state.lista.map( autor => {
+                  return (
+                    <tr key={autor.id}>
+                      <td> {autor.nome} </td>
+                      <td> {autor.email} </td>
+                    </tr>);
+                }) 
+              }
             </tbody>
           </table> 
         </div> 
