@@ -1,6 +1,14 @@
+import TratadorDeErros from '../helpers/TratadorDeErros';
+
 class HttpService {
 	_handleErrors(res) {
-		if (!res.ok) throw new Error(res.statusText);
+		if (!res.ok) {
+            if (res.status === 400) {
+                res.json().then(mensagem => new TratadorDeErros().publicaErros(mensagem.errors));
+
+                throw new Error(res.statusText);
+            }
+        }
 		return res;
 	}
 
@@ -18,7 +26,6 @@ class HttpService {
 			body: JSON.stringify(dado)
 			})
 			.then(res => this._handleErrors(res));
-
     }
 }
 

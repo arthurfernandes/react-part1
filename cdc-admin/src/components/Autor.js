@@ -38,6 +38,8 @@ class FormularioAutor extends Component{
     enviaForm(event) {
         event.preventDefault();
 
+        PubSub.publish('limpa-erros');
+
         this._httpService.post('http://localhost:8080/api/autores', {
             nome : this.state.nome,
             email : this.state.email,
