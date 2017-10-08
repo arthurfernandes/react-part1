@@ -12,9 +12,6 @@ class FormularioAutor extends Component{
         this.state = {nome: '', email: '', senha: ''};
 
         this.enviaForm = this.enviaForm.bind(this);
-        this.setNome = this.setNome.bind(this);
-        this.setEmail = this.setEmail.bind(this);
-        this.setSenha = this.setSenha.bind(this);
 
         this._httpService = new HttpService();
     }
@@ -23,22 +20,14 @@ class FormularioAutor extends Component{
         this.setState({nome: '', email: '', senha: ''});
     }
 
-    setNome(event) {
-        this.setState({nome : event.target.value});
-      }
-    
-    setEmail(event) {
-    this.setState({email : event.target.value});
-    }
-    
-    setSenha(event) {
-    this.setState({senha : event.target.value});
+    salvaAlteracao(nomeInput, event) {
+        this.setState({[nomeInput] : event.target.value});
     }
 
     enviaForm(event) {
         event.preventDefault();
 
-        PubSub.publish('limpa-erros');
+        PubSub.publish('limpa-erros', {});
 
         this._httpService.post('http://localhost:8080/api/autores', {
             nome : this.state.nome,
@@ -56,9 +45,9 @@ class FormularioAutor extends Component{
         return (
             <div className="pure-form pure-form-aligned">
             <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm}>
-              <InputCustomizado id="nome" type="text" name="nome" label="Nome" value={this.state.nome} onChange={this.setNome}/>
-              <InputCustomizado id="email" type="email" name="email" label="Email" value={this.state.email} onChange={this.setEmail}/>
-              <InputCustomizado id="senha" type="password" name="senha" label="Senha" value={this.state.senha} onChange={this.setSenha}/>
+              <InputCustomizado id="nome" type="text" name="nome" label="Nome" value={this.state.nome} onChange={this.salvaAlteracao.bind(this, 'nome')}/>
+              <InputCustomizado id="email" type="email" name="email" label="Email" value={this.state.email} onChange={this.salvaAlteracao.bind(this, 'email')}/>
+              <InputCustomizado id="senha" type="password" name="senha" label="Senha" value={this.state.senha} onChange={this.salvaAlteracao.bind(this, 'senha')}/>
   
               <BotaoSubmitCustomizado label="Gravar"/>
             </form>             

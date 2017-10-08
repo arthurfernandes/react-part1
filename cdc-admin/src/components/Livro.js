@@ -19,6 +19,10 @@ class FormularioLivro extends Component {
         this._httpService = new HttpService();
     }
 
+    _cleanForm() {
+        this.setState({titulo: '', preco: '', autorId: ''});
+    }
+
     setTitulo(event) {
         this.setState({titulo : event.target.value});
     }
@@ -34,14 +38,17 @@ class FormularioLivro extends Component {
     enviaForm(event) {
         event.preventDefault();
 
+        PubSub.publish('limpa-erros', {});
+
         this._httpService.post('http://localhost:8080/api/livros', {
             titulo : this.state.titulo,
-            preco : parseInt(this.state.preco),
-            autorId : parseInt(this.state.autorId)
+            preco : this.state.preco,
+            autorId : this.state.autorId
         })
         .then( res => res.json())
         .then( novaLista => {
             PubSub.publish('atualiza-lista-livros', novaLista);
+            this._cleanForm();
         })
         .catch( err => console.log(err));
     }
@@ -54,7 +61,7 @@ class FormularioLivro extends Component {
               <InputCustomizado id="preco" type="text" name="preco" label="Preço" value={this.state.preco} onChange={this.setPreco}/>
               
               <div className="pure-control-group">
-                <label htmlFor="nome">Autor</label> 
+                <label htmlFor="autorId">Autor</label> 
                 <select value={this.state.autorId} name="autorId" onChange={this.setAutorId}>
                     <option value=''>Selecione</option>
                     { this.props.autores.map( autor => 
@@ -128,7 +135,7 @@ class LivroBox extends Component{
         return (
             <div>
             <div className="header">
-                <h1>Cadastro de Autores</h1>
+                <h1>Cadastro de Livros</h1>
             </div>
 
             <div className="content" id="content">
