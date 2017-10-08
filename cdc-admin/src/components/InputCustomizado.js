@@ -9,7 +9,7 @@ class InputCustomizado extends Component {
 
     componentDidMount() {
         PubSub.subscribe('erro-validacao', (topico, erro) => {
-            if (erro.field == this.props.name) {
+            if (erro.field === this.props.name) {
                 this.setState({errorMessage : erro.defaultMessage});
             }
         });
