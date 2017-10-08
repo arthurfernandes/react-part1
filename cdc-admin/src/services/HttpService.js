@@ -4,7 +4,9 @@ class HttpService {
 	_handleErrors(res) {
 		if (!res.ok) {
             if (res.status === 400) {
-                res.json().then(mensagem => new TratadorDeErros().publicaErros(mensagem.errors));
+				res.json()
+					.then(mensagem => {new TratadorDeErros().publicaErros(mensagem.errors)})
+					.catch(err => console.log(res.statusText));
 
                 throw new Error(res.statusText);
             }
